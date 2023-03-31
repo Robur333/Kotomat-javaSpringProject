@@ -7,6 +7,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Optional;
+import java.util.stream.StreamSupport;
 
 @Controller // This means that this class is a Controller
 @RequestMapping(path="/demo") // This means URL's start with /demo (after Application path)
@@ -20,7 +21,15 @@ public class MainController {
             , @RequestParam String email,@RequestParam String surname, @RequestParam String password) {
         // @ResponseBody means the returned String is the response, not a view name
         // @RequestParam means it is a parameter from the GET or POST request
+        StringBuilder returnValue = new StringBuilder();
 
+        userRepository.findAll().forEach(
+                user -> {
+                    if (user.getEmail() == email)  {
+                        returnValue.append("user with that email already exists");
+                    }
+                }
+        );
         User n = new User();
         n.setName(name);
         n.setEmail(email);
@@ -63,12 +72,17 @@ public class MainController {
     }
 
     @PostMapping("/login")
-    public String getSessionVariable(HttpServletRequest request) {
-        HttpSession isLoggedIn = request.getSession();
-        isLoggedIn.setAttribute("isLoggedIn",false);
-        return "logged succesfully";
+    public String getSessionVariable(@RequestParam String email, @RequestParam String password, HttpServletRequest request) {
+        HttpSession session = request.getSession();
+        boolean isLoggedIn = StreamSupport.stream(userRepository.findAll().spliterator(), false)
+                .anyMatch(user -> user.getEmail().equals(email) && user.getPassword().equals(password));
+        if (isLoggedIn) {
+            session.setAttribute("isLoggedIn", true);
+            return "logged successfully";
+        } else {
+            return "login failed";
+        }
     }
-
     @GetMapping("/logout")
     public String endUserSession(HttpServletRequest request) {
         HttpSession isLoggedIn = request.getSession();
