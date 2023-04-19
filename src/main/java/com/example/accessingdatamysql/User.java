@@ -21,6 +21,15 @@ public class User {
 
     private String isLoggedIn;
 
+    private String[] favoriteCats;
+
+    public String[] getFavoriteCats() {
+        return favoriteCats;
+    }
+
+    public void setFavoriteCats(String[] favoriteCats) {
+        this.favoriteCats = favoriteCats;
+    }
 
     public String getIsLoggedIn() {
         return isLoggedIn;
