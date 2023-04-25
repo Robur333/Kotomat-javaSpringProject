@@ -77,24 +77,24 @@ public class ApiController {
     }
 
     @PostMapping("/login")
-    public @ResponseBody Boolean getSessionVariable(@RequestParam String email, @RequestParam String password, HttpServletRequest request) {
+    public @ResponseBody Integer getSessionVariable(@RequestParam String email, @RequestParam String password, HttpServletRequest request) {
         HttpSession session = request.getSession();
         Iterable<User> allUsers = userRepository.findAll();
-        boolean isLoggedIn = false;
+        Integer isLoggedIn = null;
 
         for (User user: allUsers
              ) {
             if (user.getEmail().equals(email) && user.getPassword().equals(password)) {
-                isLoggedIn = true;
+                isLoggedIn = user.getId();
                 break;
             }
 
         }
-    if (isLoggedIn) {
+    if (isLoggedIn != null) {
             session.setAttribute("isLoggedIn", true);
-            return true;
+            return isLoggedIn;
         } else {
-            return false;
+            return isLoggedIn;
         }
     }
     @GetMapping("/logout")
